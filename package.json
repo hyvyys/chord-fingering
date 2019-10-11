@@ -1,0 +1,31 @@
+{
+  "name": "chord-fingering",
+  "version": "1.0.0",
+  "description": "Calculate possible fingerings for a given chord and string tuning.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "chord",
+    "fingering",
+    "fretboard",
+    "voicing",
+    "guitar",
+    "diagram",
+    "interval"
+  ],
+  "author": "Adam Jagosz",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "jest": "^24.9.0"
+  },
+  "dependencies": {
+    "@tonaljs/interval": "^3.2.3",
+    "@tonaljs/note": "^3.2.4",
+    "@tonaljs/tonal": "^3.2.2",
+    "array.prototype.flatmap": "^1.2.1",
+    "string.prototype.matchall": "^4.0.0"
+  }
+}
