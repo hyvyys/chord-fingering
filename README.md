@@ -45,6 +45,8 @@ Internally calls `findChord` and `findFingerings` to return a merged chord objec
 ```js
 // ESnext
 import { findGuitarChord } from 'chord-fingering';
+// CommonJS
+const findGuitarChord = require('chord-fingering').findGuitarChord;
 
 let chord = findGuitarChord('C');
 ```
@@ -197,7 +199,10 @@ Muted strings are omitted.
           E.g. `'E2-A2-D3-G3-B3-E4'` or `['D','A','D','F#','A','D']`.                                   Without octaves, starts from octave `2`. |
 
 ```js
+// ESnext
 import { findFingerings } from 'chord-fingering';
+// CommonJS
+const findFingerings = require('chord-fingering').findFingerings;
 
 const notes = ['E', 'G#', 'B', 'F'], optionalNotes = [];
 const fingerings = findFingerings(notes, optionalNotes);
