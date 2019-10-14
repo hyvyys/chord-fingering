@@ -15,7 +15,7 @@ The data powering the project comprises 111 unique chord patterns.
 npm i chord-fingering
 ```
 
-## <a id="Usage"></a> Usage
+## <a id="Usage"></a> Basic usage
 
 ```js
 import { findGuitarChord } from 'chord-fingering';
@@ -23,6 +23,8 @@ import { findGuitarChord } from 'chord-fingering';
 let chord = findGuitarChord('C');
 console.log(chord.fingerings[0].positionString); // => 'x32010'
 ```
+
+For more in-depth examples see [API](#API).
 
 <br />
 <br />
@@ -215,8 +217,7 @@ Muted strings are omitted.
 | notes | <code>Array&lt;string&gt;</code> |  | Notes to be played, e.g. `['E', 'G#', 'B', 'D#']`. |
 | [optionalNotes] | <code>Array&lt;string&gt;</code> |  | Notes that can be omitted for ease of playing, typically the fifth in an extended chord. | 
 | [bass] | <code>string</code> |  | The lowest note in the chord, if other than the first of `notes` (typically for chord inversions). |
-| [tuning] | <code>string</code> \| <code>Array&lt;string&gt;</code> | <code>&quot;E-A-D-G-B-E&quot;</code> | Array or hyphen-delimited list of notes of the tuning from the lowest (thickest string).                                   Can include octave number after the note.
-          E.g. `'E2-A2-D3-G3-B3-E4'` or `['D','A','D','F#','A','D']`.                                   Without octaves, starts from octave `2`. |
+| [tuning] | <code>string</code> \| <code>Array&lt;string&gt;</code> | <code>&quot;E-A-D-G-B-E&quot;</code> | Array or hyphen-delimited list of notes of the tuning from the lowest (thickest string). Can include octave number after the note. E.g. `'E2-A2-D3-G3-B3-E4'` or `['D','A','D','F#','A','D']`. Without octaves, starts from octave `2`. |
 
 ```js
 // ESnext
@@ -326,8 +327,7 @@ Deduces tuning from a string.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arg | <code>string</code> \| <code>Array&lt;string&gt;</code> | Array or hyphen-delimited list of notes of the tuning from the lowest (thickest string).                              Can include octave number after the note.                              E.g. `'E-A-D-G-B-e'`, `'E2-A2-D3-G3-B3-E4'` 
-or `['D','A','D','F#','A','D']`.                              By default, starts from octave `2`. |
+| arg | <code>string</code> \| <code>Array&lt;string&gt;</code> | Array or hyphen-delimited list of notes of the tuning from the lowest (thickest string). Can include octave number after the note.  E.g. `'E-A-D-G-B-e'`, `'E2-A2-D3-G3-B3-E4'` or `['D','A','D','F#','A','D']`. By default, starts from octave `2`. |
 
 ## <a id="detectBarre"></a> detectBarre(positions, [stringCount]) ⇒ <code>object</code>
 Detect barre in a fingering.
@@ -349,8 +349,7 @@ Return all positions within the first octave on the fretboard where a set of not
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | notes | <code>Array&lt;String&gt;</code> |  | Notes to be played, e.g. `['E', 'G#', 'B', 'D#']`. |
-| [tuning] | <code>string</code> \| <code>Array&lt;string&gt;</code> | <code>&quot;E-A-D-G-B-E&quot;</code> | Array or hyphen-delimited list of notes of the tuning from the lowest (thickest string).                                   Can include octave number after the note.
-          E.g. `'E2-A2-D3-G3-B3-E4'` or `['D','A','D','F#','A','D']`.                                   Without octaves, starts from octave `2`. |
+| [tuning] | <code>string</code> \| <code>Array&lt;string&gt;</code> | <code>&quot;E-A-D-G-B-E&quot;</code> | Array or hyphen-delimited list of notes of the tuning from the lowest (thickest string). Can include octave number after the note. E.g. `'E2-A2-D3-G3-B3-E4'` or `['D','A','D','F#','A','D']`. Without octaves, starts from octave `2`. |
 
 ## <a id="getNoteValue"></a> getNoteValue(note)
 Return note stripped of octave number, e.g. `'C'`.
