@@ -1,4 +1,6 @@
-# chord-fingering
+[![npm](https://img.shields.io/npm/v/chord-fingering)](https://www.npmjs.com/package/chord-fingering)
+
+# <a id="chord-fingering"></a> chord-fingering
 
 This project uses and is inspired by [tonaljs](https://github.com/tonaljs/tonal), a music theory library. The main objectives are:
 
@@ -7,23 +9,38 @@ This project uses and is inspired by [tonaljs](https://github.com/tonaljs/tonal)
 
 The data powering the project comprises 111 unique chord patterns.
 
-# Contents
+## <a id="Installation"></a> Installation
 
-[API](#API)
+```shell
+npm i chord-fingering
+```
 
-  * [findGuitarChord](#findGuitarChord)
-  * [findChord](#findGuitarChord)
-  * [findFingerings](#findFingerings)
-  * [parseTuning](#parseTuning)
-  * [detectBarre](#detectBarre)
-  * [findPositions](#findPositions)
-  * [getNoteValue](#getNoteValue)
-  * [getNoteAbove](#getNoteAbove)
-  * [findFret](#findFret)
+## <a id="Usage"></a> Usage
 
-[Development](#Development)
+```js
+import { findGuitarChord } from 'chord-fingering';
 
-  * [Data](#Data)
+let chord = findGuitarChord('C');
+console.log(chord.fingerings[0].positionString); // => 'x32010'
+```
+
+>   ### Table of contents
+>
+>   **[chord-fingering](#chord-fingering)**  
+        [Installation](#Installation)  
+        [Usage](#Usage)  
+    **[API](#API)**  
+        [findGuitarChord](#findGuitarChord)  
+        [findChord](#findGuitarChord)  
+        [findFingerings](#findFingerings)  
+        [parseTuning](#parseTuning)  
+        [detectBarre](#detectBarre)  
+        [findPositions](#findPositions)  
+        [getNoteValue](#getNoteValue)  
+        [getNoteAbove](#getNoteAbove)  
+        [findFret](#findFret)  
+    **[Development](#Development)**  
+        [Data](#Data)
 
 # <a id="API"></a> API
 
