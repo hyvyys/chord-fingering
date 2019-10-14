@@ -11,14 +11,17 @@ const findFingerings = require('./fingerings').findFingerings;
  * @returns {object} Chord data in format `{ symbol, intervals, optionalIntervals, requiredIntervals, tonic, notes, optionalNotes, requiredNotes, bass, description, fullName, fingerings }`.
  *                   Fingerings are in format `{ positions: [ { stringIndex: Number, fret: Number, note: String } ] }`, with muted strings omitted.
  */
-function findGuitarChord(symbol, tuning) {
-  const chord = findChord(symbol);
-  const { notes, optionalNotes, bass } = chord;
-  const fingerings = findFingerings(notes, optionalNotes, bass, tuning);
-  return {
-    ...chord,
-    fingerings,
-  };
+function findGuitarChord(symbol, tuning, caseSensitive = true) {
+  const chord = findChord(symbol, caseSensitive);
+  if (chord) {
+    const { notes, optionalNotes, bass } = chord;
+    const fingerings = findFingerings(notes, optionalNotes, bass, tuning);
+    return {
+      ...chord,
+      fingerings,
+    };
+  }
+  return null;
 }
 
 module.exports = {
