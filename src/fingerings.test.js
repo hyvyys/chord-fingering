@@ -1,4 +1,5 @@
 const findFingerings = require('./fingerings').findFingerings;
+const findChord = require('./chord').findChord;
 
 function arePositionsEqual(a, b) {
   return a.stringIndex === b.stringIndex && a.fret === b.fret && a.note === b.note;
@@ -103,17 +104,68 @@ describe('fingerings', () => {
     expect(matching).toBeTruthy();
   });
 
-  // it('sort fingerings correctly', () => {
-  //   const expectedPositions = [
-  //     { stringIndex: 1, fret: 0, note: 'A' },
-  //     { stringIndex: 2, fret: 2, note: 'E' },
-  //     { stringIndex: 3, fret: 2, note: 'A' },
-  //     { stringIndex: 4, fret: 1, note: 'C' },
-  //     { stringIndex: 5, fret: 0, note: 'E' },
-  //   ];
-    
-  //   const fingerings = findFingerings(notes);
-  //   const matching = fingerings.find(f => areFingeringsEqual(expectedPositions, f.positions));
-  //   expect(matching).toBeTruthy();
-  // });
+  const pos = (s, i) => {
+    const c = findChord(s);
+    const { notes, optionalNotes } = c;
+    return findFingerings(notes, optionalNotes)[i].positionString;
+  };
+  it('sort C fingerings correctly', () => {
+    expect(pos('C', 0)).toBe('x32010');
+  });
+  it('sort Cm fingerings correctly', () => {
+    expect(pos('Cm', 0)).toBe('x35543');
+  });
+  it('sort C# fingerings correctly', () => {
+    expect(pos('C#', 0)).toBe('x46664');
+  });
+
+  it('sort D fingerings correctly', () => {
+    expect(pos('D', 0)).toBe('xx0232');
+  });
+  it('sort Dm fingerings correctly', () => {
+    expect(pos('Dm', 0)).toBe('xx0231');
+  });
+
+  it('sort E fingerings correctly', () => {
+    expect(pos('E', 0)).toBe('022100');
+  });
+  it('sort Em fingerings correctly', () => {
+    expect(pos('Em', 0)).toBe('022000');
+  });
+
+  it('sort F fingerings correctly', () => {
+    expect(pos('F', 0)).toBe('133211');
+    expect(pos('F', 1)).toBe('xx3211');
+  });
+  it('sort Fm fingerings correctly', () => {
+    expect(pos('Fm', 0)).toBe('133111');
+  });
+
+  it('sort G fingerings correctly', () => {
+    expect(pos('G', 0)).toBe('320003');
+    expect(pos('G', 1)).toBe('320033');
+  });
+  it('sort Gm fingerings correctly', () => {
+    expect(pos('Gm', 0)).toBe('355333');
+  });
+
+  it('sort A fingerings correctly', () => {
+    expect(pos('A', 0)).toBe('x02220');
+    // expect(pos('A', 1)).toBe('577655');
+  });
+  it('sort Am fingerings correctly', () => {
+    expect(pos('Am', 0)).toBe('x02210');
+  });
+
+  it('sort B fingerings correctly', () => {
+    expect(pos('B', 0)).toBe('x24442');
+    expect(pos('B', 1)).toBe('799877');
+  });
+
+  it('sort B7 fingerings correctly', () => {
+    expect(pos('B7', 0)).toBe('x21202');
+  });
+  it('sort Bm fingerings correctly', () => {
+    expect(pos('Bm', 0)).toBe('x24432');
+  });
 });

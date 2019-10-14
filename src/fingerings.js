@@ -1,3 +1,4 @@
+const tonal = require('@tonaljs/tonal');
 const flatMap = require('array.prototype.flatmap');
 flatMap.shim();
 const findPositions = require('./positions').findPositions;
@@ -13,16 +14,23 @@ function pressedFrets(fingering) {
   return fingering.positions.filter(p => p.fret > 0).map(({fret}) => fret);
 }
 
+function pressedNonBarreFrets(fingering) {
+  return pressedFrets(fingering).filter(fret => !fingering.barre || fret !== fingering.barre.fret);
+}
+
 function minFret(a) { return Math.min(...pressedFrets(a)); }
 
 function maxFret(a) { return Math.max(...pressedFrets(a)); }
 
-function fretRange(a) { return maxFret(a) - minFret(a); }
+function getFretRange(a) { return maxFret(a) - minFret(a); }
 
-function fretRangeWithMin(a, n) { return Math.max(n, fretRange(a)); }
+function getFretRangeWithMin(a, n) { return Math.max(n, getFretRange(a)); }
 
 function bassOctave(a) { return getOctave(a.positions[0].note); }
 
+function getBassFret(f) {
+  return f.positions[0].fret;
+}
 
 function openStrings(fingering) {
   return fingering.positions.filter(p => p.fret === 0).map(({stringIndex}) => stringIndex);
@@ -35,6 +43,74 @@ function fingeringToString(positions, tuning) {
     return position != null ? position.fret : 'x';
   });
   return frets.join(frets.some(f => f > 9) ? '-' : '');
+}
+
+function computeDifficulty(f, barrePenalty = 5) {
+  let consideredPositions = f.positions.filter(p =>
+    p.fret > 0
+    && (!f.barre
+    || p.stringIndex === f.barre.stringIndices.slice(-1)[0]
+    || p.fret !== f.barre.fret)
+  );
+  if (consideredPositions.length === 0)
+    consideredPositions = f.positions;
+  const a = consideredPositions.map(p => p.fret);
+  
+  function distFromNut(fret) {
+    // 65cm = classical guitar scale length
+    return 65 - 65 / (2 ** (fret / 12)); // 3.64cm first fret
+  }
+  const fretDistances = a.slice(1).map((f1, i) => {
+    const f2 = a[i];
+    const d1 = distFromNut(f1), d2 = distFromNut(f2);
+    return Math.abs(f1 - f2) > 1
+      ? Math.abs(d1 - d2)
+      : Math.abs(d1 - d2);
+  });
+
+  function transform(d) {
+    // return d;
+    return Math.pow(d, 1.1);
+    // return Math.max(distFromNut(2), d);
+    // return Math.pow(Math.max(0, d - 1) + 1, 2);
+  }
+  const fretDistanceDifficulty = fretDistances.reduce((acc, d) => acc + transform(d), 0); // for barre only chords
+  
+  const difficulty = Math.max(0,
+    fretDistanceDifficulty
+    + (f.barre ? barrePenalty : 0)
+    + (consideredPositions.length <= 3 ? -3 : 0)
+  );
+  function normalize(d) {
+    return Math.round(d * 100) / 100;
+  }
+  return normalize(difficulty); 
+}
+
+function anatomicalShape(f) {
+  if (getFretRange(f) >= 3 && !f.barre) {
+    const min = minFret(f);
+    const atMin = f.positions.filter(p => p.fret === min).map(p => p.stringIndex);
+    const max = maxFret(f);
+    const atMax = f.positions.filter(p => p.fret === max).map(p => p.stringIndex);
+    // const a = Math.min(...atMin), b = Math.max(...atMin);
+    if (atMin.length + atMax.length === HUMAN_LEFT_HAND_PLAYING_FINGERS)
+      return false;
+  }
+  return true;
+}
+
+function mutedStringsBetween (f, tuning) {
+  const minString = f.positions[0].stringIndex;
+  const maxString = f.positions.slice(-1)[0].stringIndex;
+  const strummedStrings = tuning.map((s, i) => i).slice(minString, maxString + 1);
+  const mutedStrummedStrings = strummedStrings.filter(i => !f.positions.find(p => p.stringIndex === i));
+  return mutedStrummedStrings.length;
+}
+
+function distinctNotesRatio(f) {
+  const distinctNotes = f.positions.map(p => p.note).filter((n, i, a) => a.indexOf(n) === i);
+  return distinctNotes.length / f.positions.length;
 }
 
 /**
@@ -78,9 +154,10 @@ function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-
           return position.fret === 0 ||
             nonZeroFrets.every(fret => Math.abs(position.fret - fret) <= MAX_FRET_DISTANCE);
         });
-
-        if (reachablePositions.length) {
-          return reachablePositions.map(position => [...fingering, position]);
+        const sensiblePositions = reachablePositions.filter(p =>
+          tonal.distance(bassPosition.note, p.note)[0] !== '-');
+        if (sensiblePositions.length) {
+          return sensiblePositions.map(position => [...fingering, position]);
         }
         else {
           return [ fingering ]; // mute this string
@@ -90,37 +167,65 @@ function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-
     fingerings = [ ...fingerings, ...fingeringsForThisBass ];
   }
 
+  const isChordFull = (f) => requiredNotes.every(note => f.find(position => areNotesEqual(position.note, note)));
+  const enoughFingers = (f) => {
+    if (!f.barre) {
+      return pressedFrets(f).length <= HUMAN_LEFT_HAND_PLAYING_FINGERS;
+    }
+    else {
+      return pressedNonBarreFrets(f).length <= HUMAN_LEFT_HAND_PLAYING_FINGERS - 1;
+    }
+  };
+
+  function moreThanFourStrings(f) {
+    return Math.min(4, f.positions.length);
+  }
+
   fingerings = fingerings
-    .filter(f => 
-      requiredNotes.every(note => f.find(position => areNotesEqual(position.note, note)))
-    )
+    .filter(isChordFull)
     .map(f => ({
       positions: f,
       barre: detectBarre(f),
       positionString: fingeringToString(f, tuning),
     }))
-    .filter(f => {
-      if (!f.barre) {
-        return pressedFrets(f).length <= HUMAN_LEFT_HAND_PLAYING_FINGERS;
-      }
-      else {
-        const nonBarrePositions = f.positions.filter(p => p.fret !== f.barre.fret);
-        return nonBarrePositions.length <= HUMAN_LEFT_HAND_PLAYING_FINGERS - 1;
-      }
-    })
+    .filter(enoughFingers)
+    .filter(anatomicalShape)
+    .map(f => ({
+      ...f,
+      difficulty: computeDifficulty(f),
+    }))
+    .map(f => ({
+      ...f,
+    }))
     .sort((a, b) => {
-      const lowerMinFret = minFret(a) - minFret(b);
+      // const lowerMinFret = minFret(a) - minFret(b);
+      // const moreOpenStrings = - (openStrings(a).length - openStrings(b).length);
+      // const smallerFretRange = getFretRangeWithMin(a, 2) - getFretRangeWithMin(b, 2);
+      // const lowerBass = bassOctave(a) - bassOctave(b);
+      const lessMutedStringsInBetween = mutedStringsBetween(a, tuning) - mutedStringsBetween(b, tuning);
+      const notLessThanFourStrings = -(moreThanFourStrings(a) - moreThanFourStrings(b));
+      const lessRepeatingNotes = -(distinctNotesRatio(a) - distinctNotesRatio(b));
       const lowerMaxFret = maxFret(a) - maxFret(b);
-      const moreOpenStrings = - (openStrings(a).length - openStrings(b).length);
-      const smallerFretRange = fretRangeWithMin(a, 2) - fretRangeWithMin(b, 2);
-      const lowerBass = bassOctave(a) - bassOctave(b);
+
+      function limitDifficulty(f, max) {
+        return Math.max(f.difficulty, max);
+      }
+
+      const easier = a.difficulty - b.difficulty;
+      const easierThan12 = limitDifficulty(a, 12) - limitDifficulty(b, 12);
+      // const easierThan8 = limitDifficulty(a, 8) - limitDifficulty(b, 8);
+      const easierThan14 = limitDifficulty(a, 14) - limitDifficulty(b, 14);
+      const lowerBassFret = getBassFret(a) - getBassFret(b);
 
       return 0
-        || smallerFretRange
-        || lowerBass
-        || lowerMinFret
-        || moreOpenStrings
+        || notLessThanFourStrings
+        || lessMutedStringsInBetween
+        || lessRepeatingNotes
+        || easierThan14
+        || lowerBassFret
+        || easierThan12
         || lowerMaxFret
+        || easier
         || 0;
     });
   return fingerings;
