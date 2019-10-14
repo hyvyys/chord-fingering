@@ -24,6 +24,9 @@ let chord = findGuitarChord('C');
 console.log(chord.fingerings[0].positionString); // => 'x32010'
 ```
 
+<br />
+<br />
+
 >   ### Table of contents
 >
 >   **[chord-fingering](#chord-fingering)**  
