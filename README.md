@@ -2,11 +2,10 @@
 
 # <a id="chord-fingering"></a> chord-fingering
 
-This project uses and is inspired by [tonaljs](https://github.com/tonaljs/tonal), a music theory library. The main objectives are:
+A CommonJS module for generating chord fingerings for any tuning. Chords can be found by their symbols in the Anglophone alphabetic musical notation.
 
-  * chord symbol recognition,
-  * generation of chord fingerings.
-
+The package has been developed for the [Chordline app](https://hyvyys.github.io/chordline/).
+This project uses and is inspired by [tonaljs](https://github.com/tonaljs/tonal), a music theory library.
 The data powering the project comprises 111 unique chord patterns.
 
 ## <a id="Installation"></a> Installation
@@ -25,8 +24,6 @@ console.log(chord.fingerings[0].positionString); // => 'x32010'
 ```
 
 For more in-depth examples see [API](#API).
-
-The package has been developed for the [Chordline app](https://hyvyys.github.io/chordline/).
 
 <br />
 <br />
