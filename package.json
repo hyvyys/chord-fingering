@@ -16,7 +16,13 @@
     "interval"
   ],
   "author": "Adam Jagosz",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/hyvyys/chord-fingering#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyvyys/chord-fingering.git"
+  },
+  "bugs": "https://github.com/hyvyys/chord-fingering/issues",
   "devDependencies": {
     "eslint": "^6.5.1",
     "jest": "^24.9.0"
