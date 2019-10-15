@@ -26,6 +26,8 @@ console.log(chord.fingerings[0].positionString); // => 'x32010'
 
 For more in-depth examples see [API](#API).
 
+The package has been developed for the [Chordline app](https://hyvyys.github.io/chordline/).
+
 <br />
 <br />
 
