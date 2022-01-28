@@ -127,6 +127,14 @@ function distinctNotesRatio(f) {
  */
 function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-A-D-G-B-E') {
   tuning = parseTuning(tuning);
+  let originalTuning = tuning;
+  let sortedTuning = tuning.slice().sort((a, b) => {
+    let i = tonal.interval(tonal.distance(a, b)).semitones;
+    return -i;
+  });
+  tuning = sortedTuning;
+
+
   let fingerings = [];
   let positions = findPositions(notes, tuning);
 
@@ -183,6 +191,11 @@ function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-
 
   fingerings = fingerings
     .filter(isChordFull)
+    .map(f => {
+      f.forEach(string => string.stringIndex = originalTuning.indexOf(string.stringNote));
+      f.sort((a, b) => a.stringIndex - b.stringIndex);
+      return f;
+    })
     .map(f => ({
       positions: f,
       barre: detectBarre(f),
