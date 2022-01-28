@@ -1,6 +1,6 @@
 {
   "name": "chord-fingering",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Calculate possible fingerings for a given chord and string tuning.",
   "main": "index.js",
   "scripts": {
