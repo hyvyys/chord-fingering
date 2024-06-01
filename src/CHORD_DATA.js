@@ -48,6 +48,7 @@ const CHORD_DATA = [
   ['1P 4P 5P', '', 'sus4', 'sus', 'suspended 4th'],
   ['1P 2M 5P', '', 'sus2', '', 'suspended 2nd'],
   ['1P 4P 5P 7m', '', '7sus4', '', 'suspended 4th seventh'],
+  ['1P 2M 5P 7m', '', '7sus2', '', 'suspended 2nd seventh'],
   ['1P 5P 7m 9M 11P', '', '11', '', 'eleventh'],
   ['1P 4P 5P 7m 9m', '', '', 'sus4b9 susb9 (b9)sus phryg', 'suspended 4th b9'],
   ['1P 5P', '', '5', '', 'fifth'],
