@@ -137,15 +137,19 @@ function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-
 
   let fingerings = [];
   let positions = findPositions(notes, tuning);
+  let isTuningAscending = JSON.stringify(tuning) === JSON.stringify(originalTuning);
 
   const requiredNotes = notes.slice().filter(n => !optionalNotes.includes(n));
   let maxBassStringIndex = tuning.length - requiredNotes.length;
   if (!requiredNotes.includes(bass)) {
     maxBassStringIndex--;
   }
-  let bassPositions = positions
-    .filter(p => areNotesEqual(p.note, bass))
-    .filter(p => p.stringIndex <= maxBassStringIndex);
+  let bassPositions = positions;
+  if (isTuningAscending) {
+    bassPositions = positions
+      .filter(p => areNotesEqual(p.note, bass))
+      .filter(p => p.stringIndex <= maxBassStringIndex);
+  }
 
   for (let i = 0; i < bassPositions.length; i++) {
     let bassPosition = bassPositions[i];
@@ -162,8 +166,11 @@ function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-
           return position.fret === 0 ||
             nonZeroFrets.every(fret => Math.abs(position.fret - fret) <= MAX_FRET_DISTANCE);
         });
-        const sensiblePositions = reachablePositions.filter(p =>
-          tonal.distance(bassPosition.note, p.note)[0] !== '-');
+        let sensiblePositions = reachablePositions;
+        if (isTuningAscending) {
+          sensiblePositions = reachablePositions.filter(p =>
+            tonal.distance(bassPosition.note, p.note)[0] !== '-');
+        }
         if (sensiblePositions.length) {
           return sensiblePositions.map(position => [...fingering, position]);
         }
@@ -233,12 +240,14 @@ function findFingerings(notes, optionalNotes = [], bass = notes[0], tuning = 'E-
       return 0
         || notLessThanFourStrings
         || lessMutedStringsInBetween
+        || (isTuningAscending ? 0 : lowerMaxFret)
+        || (isTuningAscending ? 0 : easier)
         || lessRepeatingNotes
         || easierThan14
         || lowerBassFret
         || easierThan12
-        || lowerMaxFret
-        || easier
+        || (isTuningAscending ? lowerMaxFret : 0)
+        || (isTuningAscending ? easier : 0)
         || 0;
     });
   return fingerings;
